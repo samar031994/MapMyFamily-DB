@@ -1,3 +1,4 @@
+import json
 from fastapi.responses import Response
 from fastapi import FastAPI, Body, HTTPException, status
 from pydantic.functional_validators import BeforeValidator
@@ -96,3 +97,18 @@ async def create_tree_diagram(tree_diagram: TreeDiagram = Body(...)):
 async def fetch_tree_diagram(tree_diagram_id: str):
     tree_diagram = await tree_diagram_collection.find_one({"_id": ObjectId(tree_diagram_id)})
     return tree_diagram 
+
+@app.options(
+    "/tree_diagram/",
+    response_description="Get all tree diagrams",
+)
+async def create_tree_options():
+    content = {"message": "Options response"}
+    headers = {
+        "Access-Control-Allow-Origin" : "http://localhost:3000",
+        "Access-Control-Allow-Credentials" : "true",
+        "Access-Control-Allow-Methods" : "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers" : "Content-Type, Origin, Accept"
+        }
+    return Response(content=json.dumps(content), headers=headers)
+    
