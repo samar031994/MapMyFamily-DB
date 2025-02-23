@@ -9,6 +9,10 @@
       {
         "src": "/(.*)",
         "dest": "app.py"
+      },
+      { 
+        "src": "/openapi.json", 
+        "dest": "app.py"
       }
     ]
   }
