@@ -11,15 +11,17 @@ import motor.motor_asyncio
 from pymongo import ReturnDocument
 import os
 from typing import Optional
-
 import uvicorn
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI(
     title="FastAPI MongoDB API for MapMyFamily",
     summary="API backend for MapMyFamily using MongoDB.",
 )
-
-client = motor.motor_asyncio.AsyncIOMotorClient('mongodb+srv://mapmyfamily:qwerty1234@mapmyfamily.kqzwp.mongodb.net/?retryWrites=true&w=majority&appName=MapMyFamily')
+print("app.py")
+print(os.environ.get("MONGODB_URI"))
+client = motor.motor_asyncio.AsyncIOMotorClient(os.environ.get("MONGODB_URI"))
 db = client.map_my_family
 user_collection = db.get_collection("User")
 tree_diagram_collection = db.get_collection("TreeDiagram")
@@ -66,13 +68,20 @@ async def health():
 @app.get(
     "/user/{user_id}",
     response_description="Get user by user_id",
-    response_model=User,
     status_code=status.HTTP_200_OK,
     response_model_by_alias=False,
 )
 async def fetch_user(user_id: str):
-    user = await user_collection.find_one({"user_id": user_id})
-    return user
+    try:
+        user = await user_collection.find_one({"user_id": user_id})
+        if not user:
+            raise Exception("User search returned null")
+        return {"user": user}
+    except Exception as e:
+         raise HTTPException(
+              status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+              detail=f"Failed to get valid user: {str(e)}"
+         )
 
 @app.post(
     '/tree_diagram/',
@@ -96,13 +105,20 @@ async def create_tree_diagram(tree_diagram: TreeDiagram = Body(...)):
 
 @app.get(
     '/tree_diagram/{tree_diagram_id}',
-    response_description="Get tree diagram by tree_diagram_id",
-    response_model=TreeDiagram,
+    response_description="Get tree diagram by tree_diagram_id"
 )
 async def fetch_tree_diagram(tree_diagram_id: str):
-    # tree_diagram = await tree_diagram_collection.find_one({"_id": ObjectId(tree_diagram_id)})
-    # return tree_diagram
-    return {"message": "Get tree diagram by tree_diagram_id"}
+    try:
+        tree_diagram = await tree_diagram_collection.find_one({"_id": ObjectId(tree_diagram_id)})
+        return {
+             "tree": tree_diagram
+        }
+    except Exception as e:
+            raise HTTPException(
+                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                 detail=f"Failed to get valid tree diagram: {str(e)}"
+            )
+
 
 @app.options(
     "/tree_diagram/",
@@ -119,5 +135,5 @@ async def create_tree_options():
     return Response(content=json.dumps(content), headers=headers)
 
 if __name__ == '__main__':
-	uvicorn.run(app, port=8080, host="0.0.0.0")
+	uvicorn.run(app, port=8000, host="0.0.0.0")
     
