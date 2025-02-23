@@ -58,6 +58,12 @@ async def create_user(user: User = Body(...)):
     return new_user
 
 @app.get(
+          "/"
+)
+async def health():
+     return {"status": "ok"}
+
+@app.get(
     "/user/{user_id}",
     response_description="Get user by user_id",
     response_model=User,
