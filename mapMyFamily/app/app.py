@@ -12,6 +12,8 @@ from pymongo import ReturnDocument
 import os
 from typing import Optional
 
+import uvicorn
+
 app = FastAPI(
     title="FastAPI MongoDB API for MapMyFamily",
     summary="API backend for MapMyFamily using MongoDB.",
@@ -108,4 +110,7 @@ async def create_tree_options():
         "Access-Control-Allow-Headers" : "Content-Type, Origin, Accept"
         }
     return Response(content=json.dumps(content), headers=headers)
+
+if __name__ == '__main__':
+	uvicorn.run(app, port=8080, host="0.0.0.0")
     
