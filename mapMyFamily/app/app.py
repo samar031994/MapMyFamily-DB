@@ -94,8 +94,9 @@ async def create_tree_diagram(tree_diagram: TreeDiagram = Body(...)):
     response_model=TreeDiagram,
 )
 async def fetch_tree_diagram(tree_diagram_id: str):
-    tree_diagram = await tree_diagram_collection.find_one({"_id": ObjectId(tree_diagram_id)})
-    return tree_diagram 
+    # tree_diagram = await tree_diagram_collection.find_one({"_id": ObjectId(tree_diagram_id)})
+    # return tree_diagram
+    return {"message": "Get tree diagram by tree_diagram_id"}
 
 @app.options(
     "/tree_diagram/",
