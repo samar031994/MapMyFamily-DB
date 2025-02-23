@@ -53,10 +53,7 @@ async def create_user(user: User = Body(...)):
     new_user = await user_collection.insert_one(
         user.model_dump(by_alias=True, exclude=["id"])
     )
-    created_student = await user_collection.find_one(
-        {"_id": new_user.inserted_id}
-    )
-    return created_student
+    return new_user
 
 @app.get(
     "/user/{user_id}",
