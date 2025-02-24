@@ -54,9 +54,15 @@ async def create_user(user: User = Body(...)):
 
     A unique `id` will be created and provided in the response.
     """
-    new_user = await user_collection.insert_one(
-        user.model_dump(by_alias=True, exclude=["id"])
-    )
+    try:
+        new_user = await user_collection.insert_one(
+            user.model_dump(by_alias=True, exclude=["id"])
+        )
+    except Exception as e:
+         raise HTTPException(
+              status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to create user: {str(e)}"
+         )
     return new_user
 
 @app.get(
